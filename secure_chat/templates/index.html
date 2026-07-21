@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Chat</title>
+    <style>
+        body { 
+            background-color: #1a1a2e; 
+            color: #fff; 
+            font-family: sans-serif; 
+            padding: 20px; 
+        }
+        #chat-box { 
+            height: 300px; 
+            background: #16213e; 
+            padding: 10px; 
+            overflow-y: scroll; 
+            margin-bottom: 10px; 
+            border-radius: 5px;
+        }
+        input, button { 
+            padding: 10px; 
+            margin: 5px 0; 
+            border-radius: 5px; 
+            border: none;
+        }
+        button { 
+            cursor: pointer; 
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔒 Secure Chat</h1>
+    
+    <!-- Tela Inicial (Login/Registro) -->
+    <div id="login-area">
+        <h3>Acesso ao Sistema</h3>
+        <input type="text" id="username" placeholder="Usuário">
+        <input type="password" id="password" placeholder="Senha"><br>
+        <button onclick="enviarCredenciais('login')" style="background-color: #0f3460;">1. Fazer Login</button>
+        <button onclick="enviarCredenciais('register')" style="background-color: #2e8b57;">2. Novo Usuário</button>
+    </div>
+
+    <!-- Tela do Chat -->
+    <div id="chat-area" style="display: none;">
+        <h3>Logado como: <span id="user-display"></span></h3>
+        <button onclick="listarUsuarios()" style="background-color: #d97706; margin-bottom: 10px;">👥 Ver Usuários Online</button>
+        
+        <div id="chat-box"></div>
+        
+        <input type="text" id="target" placeholder="Destinatário">
+        <input type="text" id="message" placeholder="Sua mensagem">
+        <button onclick="enviarMensagem()" style="background-color: #0f3460;">Enviar</button>
+    </div>
+
+    <!-- Script do Socket.IO e nossa lógica -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('connect', function() {
+            console.log('Conectado ao servidor web!');
+        });
+
+        // Envia as credenciais informando se é login ou registro
+        function enviarCredenciais(acao) {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            if(user && pass) {
+                socket.emit('tentar_login', {username: user, password: pass, action: acao});
+            } else {
+                alert("Preencha usuário e senha!");
+            }
+        }
+
+        socket.on('login_resposta', function(data) {
+            if(data.sucesso) {
+                document.getElementById('login-area').style.display = 'none';
+                document.getElementById('chat-area').style.display = 'block';
+                document.getElementById('user-display').innerText = data.username;
+            } else {
+                alert("Erro: " + data.mensagem);
+            }
+        });
+
+        // Função para pedir a lista de usuários online
+        function listarUsuarios() {
+            socket.emit('listar_usuarios');
+        }
+
+        // Exibe a lista de usuários quando o servidor responder
+        socket.on('usuarios_online', function(data) {
+            if(data.users.length > 0) {
+                alert("Usuários online:\n" + data.users.join('\n'));
+            } else {
+                alert("Nenhum outro usuário online no momento.");
+            }
+        });
+
+        function enviarMensagem() {
+            const target = document.getElementById('target').value;
+            const message = document.getElementById('message').value;
+
+            if(target && message) {
+                socket.emit('enviar_mensagem', {target: target, message: message});
+                document.getElementById('message').value = '';
+            } else {
+                alert("Preencha o destinatário e a mensagem!");
+            }
+        }
+
+        socket.on('nova_mensagem', function(data) {
+            const chatBox = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.style.marginBottom = '10px';
+            div.innerHTML = `<strong style="color: #e94560;">${data.remetente}:</strong> ${data.texto}`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    </script>
+</body>
+</html>
