@@ -1,6 +1,7 @@
 # Chat Seguro com Criptografia Híbrida
 
 Sistema de mensagens em rede que demonstra conceitos de criptografia: **RSA + AES**, **SHA-256** e **Sockets TCP**.
+Link Youtube: https://youtu.be/mdzB8XwtLcM?si=j1Y-z8RlDF08kyNe
 
 ## 🔐 Funcionalidades
 
