@@ -4,56 +4,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body { 
-            background-color: #1a1a2e; 
-            color: #fff; 
-            font-family: sans-serif; 
-            padding: 20px; 
+            background-color: #0f172a; /* Fundo escuro moderno */
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        #chat-box { 
-            height: 300px; 
-            background: #16213e; 
-            padding: 10px; 
-            overflow-y: scroll; 
-            margin-bottom: 10px; 
-            border-radius: 5px;
+
+        .container {
+            background-color: #1e293b; /* Cor do card */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
         }
-        input, button { 
-            padding: 10px; 
-            margin: 5px 0; 
-            border-radius: 5px; 
-            border: none;
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            color: #38bdf8; /* Azul claro para destaque */
         }
+
+        h3 {
+            margin-bottom: 15px;
+            font-weight: 400;
+            font-size: 1.1rem;
+            color: #94a3b8;
+        }
+
+        /* Estilo dos Inputs */
+        input { 
+            width: 100%;
+            padding: 12px 15px; 
+            margin-bottom: 15px; 
+            border-radius: 8px; 
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #38bdf8;
+        }
+
+        /* Estilo dos Botões */
         button { 
+            width: 100%;
+            padding: 12px; 
+            margin-bottom: 10px; 
+            border-radius: 8px; 
+            border: none;
             cursor: pointer; 
             color: white;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-login { background-color: #2563eb; } /* Azul royal */
+        .btn-register { background-color: #059669; } /* Verde esmeralda */
+        .btn-users { background-color: #d97706; margin-bottom: 20px; } /* Laranja */
+        
+        /* Área do Chat */
+        #chat-box { 
+            height: 350px; 
+            background: #0f172a; 
+            padding: 15px; 
+            overflow-y: auto; 
+            margin-bottom: 15px; 
+            border-radius: 8px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Balões de Mensagem */
+        .message-bubble {
+            background-color: #334155;
+            padding: 10px 15px;
+            border-radius: 12px;
+            border-top-left-radius: 2px;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message-sender {
+            font-size: 0.8rem;
+            color: #38bdf8;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .message-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* Animação suave pro chat */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid pros inputs de envio */
+        .send-area {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .send-area input {
+            margin-bottom: 0;
         }
     </style>
 </head>
 <body>
-    <h1>🔒 Secure Chat</h1>
     
-    <!-- Tela Inicial (Login/Registro) -->
-    <div id="login-area">
-        <h3>Acesso ao Sistema</h3>
-        <input type="text" id="username" placeholder="Usuário">
-        <input type="password" id="password" placeholder="Senha"><br>
-        <button onclick="enviarCredenciais('login')" style="background-color: #0f3460;">1. Fazer Login</button>
-        <button onclick="enviarCredenciais('register')" style="background-color: #2e8b57;">2. Novo Usuário</button>
-    </div>
+    <div class="container">
+        <h1>🔒 Secure Chat</h1>
+        
+        <!-- Tela Inicial (Login/Registro) -->
+        <div id="login-area">
+            <h3>Acesso ao Sistema</h3>
+            <input type="text" id="username" placeholder="Usuário">
+            <input type="password" id="password" placeholder="Senha">
+            <button class="btn-login" onclick="enviarCredenciais('login')">Fazer Login</button>
+            <button class="btn-register" onclick="enviarCredenciais('register')">Novo Usuário</button>
+        </div>
 
-    <!-- Tela do Chat -->
-    <div id="chat-area" style="display: none;">
-        <h3>Logado como: <span id="user-display"></span></h3>
-        <button onclick="listarUsuarios()" style="background-color: #d97706; margin-bottom: 10px;">👥 Ver Usuários Online</button>
-        
-        <div id="chat-box"></div>
-        
-        <input type="text" id="target" placeholder="Destinatário">
-        <input type="text" id="message" placeholder="Sua mensagem">
-        <button onclick="enviarMensagem()" style="background-color: #0f3460;">Enviar</button>
+        <!-- Tela do Chat -->
+        <div id="chat-area" style="display: none;">
+            <h3>Logado como: <strong id="user-display" style="color: #38bdf8;"></strong></h3>
+            <button class="btn-users" onclick="listarUsuarios()">👥 Ver Usuários Online</button>
+            
+            <div id="chat-box"></div>
+            
+            <div class="send-area">
+                <input type="text" id="target" placeholder="Para quem?">
+                <input type="text" id="message" placeholder="Sua mensagem..." onkeypress="handleEnter(event)">
+            </div>
+            <button class="btn-login" onclick="enviarMensagem()">Enviar Mensagem</button>
+        </div>
     </div>
 
     <!-- Script do Socket.IO e nossa lógica -->
@@ -65,7 +184,6 @@
             console.log('Conectado ao servidor web!');
         });
 
-        // Envia as credenciais informando se é login ou registro
         function enviarCredenciais(acao) {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
@@ -87,12 +205,10 @@
             }
         });
 
-        // Função para pedir a lista de usuários online
         function listarUsuarios() {
             socket.emit('listar_usuarios');
         }
 
-        // Exibe a lista de usuários quando o servidor responder
         socket.on('usuarios_online', function(data) {
             if(data.users.length > 0) {
                 alert("Usuários online:\n" + data.users.join('\n'));
@@ -100,6 +216,13 @@
                 alert("Nenhum outro usuário online no momento.");
             }
         });
+
+        // Adicionada função pra enviar apertando "Enter"
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                enviarMensagem();
+            }
+        }
 
         function enviarMensagem() {
             const target = document.getElementById('target').value;
@@ -113,11 +236,17 @@
             }
         }
 
+        // Alterado pra criar os balões de mensagem estilizados
         socket.on('nova_mensagem', function(data) {
             const chatBox = document.getElementById('chat-box');
             const div = document.createElement('div');
-            div.style.marginBottom = '10px';
-            div.innerHTML = `<strong style="color: #e94560;">${data.remetente}:</strong> ${data.texto}`;
+            
+            div.className = 'message-bubble';
+            div.innerHTML = `
+                <div class="message-sender">${data.remetente}</div>
+                <div class="message-text">${data.texto}</div>
+            `;
+            
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         });

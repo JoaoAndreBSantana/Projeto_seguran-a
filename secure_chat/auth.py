@@ -180,3 +180,12 @@ class UserDatabase:
             del user['salt']
             return user
         return None
+
+    def update_public_key(self, username, public_key_pem):
+        """Atualiza a chave pública do usuário no banco (JSON) ao logar"""
+        if self.user_exists(username):
+            key_str = public_key_pem.decode('utf-8') if isinstance(public_key_pem, bytes) else public_key_pem
+            self.users[username]['public_key'] = key_str
+            self._save_database()
+            return True
+        return False
