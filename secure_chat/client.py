@@ -121,11 +121,6 @@ class SecureChatClient:
         self.private_key, self.public_key = RSACrypto.generate_key_pair(2048)
         public_key_pem = RSACrypto.serialize_public_key(self.public_key)
         
-        # DEBUG - hash da chave pública
-        import hashlib
-        pub_key_hash = hashlib.sha256(public_key_pem).hexdigest()[:16]
-        print(f"[DEBUG] Chave pública gerada (hash): {pub_key_hash}")
-        
         # Envia requisição de registro
         self._send_message({
             'action': 'register',
@@ -209,11 +204,6 @@ class SecureChatClient:
         
         recipient_public_key_pem = response.get('public_key').encode('utf-8')
         
-        # DEBUG - hash da chave pública recebida
-        import hashlib
-        recv_key_hash = hashlib.sha256(recipient_public_key_pem).hexdigest()[:16]
-        print(f"[DEBUG] Chave pública de {target} recebida (hash): {recv_key_hash}")
-        
         recipient_public_key = RSACrypto.deserialize_public_key(recipient_public_key_pem)
         
         # Escreve mensagem
@@ -231,9 +221,6 @@ class SecureChatClient:
         
         # Criptografa mensagem com AES
         iv, ciphertext = AESCrypto.encrypt(aes_key, message_text)
-        
-        # DEBUG
-        print(f"[DEBUG] Generated AES key length: {len(aes_key)}")
         
         # Criptografa chave AES com RSA público do destinatário
         encrypted_key = RSACrypto.encrypt(recipient_public_key, aes_key)
@@ -267,15 +254,9 @@ class SecureChatClient:
         ciphertext_hex = response.get('ciphertext')
         
         try:
-            # DEBUG
-            print(f"[DEBUG] Chave privada própria (hash): {RSACrypto.serialize_public_key(self.public_key).hex()[:32]}")
-            
             # Descriptografa chave AES com chave privada RSA
             encrypted_key = bytes.fromhex(encrypted_key_hex)
             aes_key = RSACrypto.decrypt(self.private_key, encrypted_key)
-            
-            # DEBUG
-            print(f"[DEBUG] AES key length: {len(aes_key)}")
             
             # Descriptografa mensagem com AES
             iv = bytes.fromhex(iv_hex)
@@ -301,8 +282,6 @@ class SecureChatClient:
         
         except Exception as e:
             print(f"✗ Erro ao descriptografar mensagem: {type(e).__name__}: {e}")
-            import traceback
-            traceback.print_exc()
     
     def show_menu(self):
         """Exibe menu interativo"""

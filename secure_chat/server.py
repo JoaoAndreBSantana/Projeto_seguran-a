@@ -161,6 +161,11 @@ class SecureChatServer:
             self._send_message(client_socket, {'status': 'error', 'message': 'Autenticação falhou'})
             logger.warning(f"Tentativa de login falhada para: {username}")
             return None
+            
+        # NOVA ADIÇÃO: Atualiza a chave pública no banco ao logar
+        public_key = request.get('public_key')
+        if public_key:
+            self.db.update_public_key(username, public_key)
         
         logger.info(f"Login bem-sucedido: {username}")
         return username
